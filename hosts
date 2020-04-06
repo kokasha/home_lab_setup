@@ -11,8 +11,10 @@ XR-P01
 XR-PE01
 
 [junos]
-MX-P[02:03]
-MX-PE[03:04]
+MX-P02
+MX-P03
+MX-PE03
+MX-PE04
 
 
 
