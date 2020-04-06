@@ -1,0 +1,91 @@
+- name: Create all Required Folders
+  import_tasks: build_dir.yml
+  tags: always
+
+- name: FACT >> SET Destination Directory
+  set_fact: dest_dir={{group_vars_dir}}/all
+  run_once: yes
+  tags: always
+
+# - name: INVENTORY // Create Data Model for INVENTORY
+#   blockinfile:
+#     block: |
+#       {{ INVENTORY | to_nice_yaml }}
+#     path: "{{ dest_dir }}/INVENTORY.yml"
+#     create: yes
+#   run_once: yes
+
+- name: MGMT // Create Data Model for MGMT
+  blockinfile:
+    block: |
+      {{ MGMT | to_nice_yaml }}
+    path: "{{ dest_dir }}/MGMT.yml"
+    create: yes
+  run_once: yes
+
+  
+- name: INTFs // Create Data Model for Interfaces
+  blockinfile:
+    block: |
+      {{ INTFs | to_nice_yaml }}
+    path: "{{ dest_dir }}/INTFs.yml"
+    create: yes
+  run_once: yes
+
+- name: OSPF // Create Data Model for OSPF
+  blockinfile:
+    block: |
+      {{ OSPF | to_nice_yaml }}
+    path: "{{ dest_dir }}/OSPF.yml"
+    create: yes
+  run_once: yes
+
+- name: MPLS // Create Data Model for MPLS
+  blockinfile:
+    block: |
+      {{ MPLS | to_nice_yaml }}
+    path: "{{ dest_dir }}/MPLS.yml"
+    create: yes
+  run_once: yes
+
+- name: BGP // Create Data Model for BGP
+  blockinfile:
+    block: |
+      {{ BGP | to_nice_yaml }}
+      {{ lookup('template','bgp.j2') }}
+    path: "{{ dest_dir }}/BGP.yml"
+    create: yes
+  run_once: yes
+
+# - name: SECURITY // Create Data Model for SECURITY
+#   blockinfile:
+#     block: |
+#       {{ SECURITY | to_nice_yaml }}
+#     path: "{{ dest_dir }}/SECURITY.yml"
+#     create: yes
+#   when: SECURITY is defined
+#   run_once: yes
+
+# - name: ROUTE-POLICY // Create Data Model for ROUTING POLICIES
+#   blockinfile:
+#     block: |
+#       {{ ROUTE_POLICY | to_nice_yaml }}
+#     path: "{{ dest_dir }}/ROUTE_POLICY.yml"
+#     create: yes
+#   when: ROUTE_POLICY is defined
+#   run_once: yes
+
+- name: NETWROK TOPOLOGY // Create Data Model for NET_TOPO
+  blockinfile:
+    block: "{{ lookup('template','infra.j2') }}"
+    path: "{{ dest_dir }}/NET_TOPO.yml"
+    create: yes
+  run_once: yes
+  tags: net_topo
+
+# - name: "Generate Host Specifc BGP Data"
+#   blockinfile:
+#     block: "{{ lookup('template','model/bgp.j2') }}"
+#     path: "host_vars/{{ inventory_hostname }}/bgp.yml"
+#     create: yes
+#   tags: bgp

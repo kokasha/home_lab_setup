@@ -1,0 +1,20 @@
+[core]
+XR-P01    ansible_host=172.20.5.2 
+MX-P02    ansible_host=172.20.5.3
+MX-P03    ansible_host=172.20.5.4
+XR-PE01    ansible_host=172.20.5.5
+#XR-PE02    ansible_host=172.20.5.6
+MX-PE03    ansible_host=172.20.5.7
+MX-PE04    ansible_host=172.20.5.8
+
+[iosxr]
+XR-P01
+XR-PE01
+#XR-PE[01:02]
+
+[junos]
+MX-P[02:03]
+MX-PE[03:04]
+
+
+

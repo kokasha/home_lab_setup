@@ -1,0 +1,69 @@
+    - name: Collect Basic Information
+      iosxr_command:
+        commands:
+          - show ip interface brief
+      register: iosxr_interfaces
+      vars:
+        ansible_connection: network_cli
+    
+    - name: Parse Using PyATS
+      set_fact:
+        pyats_iosxr_interfaces: "{{ iosxr_interfaces.stdout[0] | pyats_parser('show ip interface brief','iosxr') }}"
+    
+    - name: Save PyATS Data
+      copy:
+        content: "{{ pyats_iosxr_interfaces | to_nice_json }}"
+        dest: "{{ pyats_snapshot_dir }}/{{ inventory_hostname }}/pyats_iosxr_interfaces.json"
+      when: take_snapshot
+
+    - name: Validate Interface State
+      assert:
+        that:
+          - pyats_iosxr_interfaces.interface[item.port].interface_status == 'Up'
+        fail_msg: |
+          {{ item.port }} on {{ inventory_hostname }} is Down
+        success_msg: |
+          {{ item.port }} on {{ inventory_hostname }} is Operational
+
+      loop: "{{ interfaces }}"
+      loop_control:
+        label: "{{ item.port }}"
+      register: phy_interface_state
+      when:
+        - interfaces is defined
+
+    - debug: var=phy_interface_state
+
+    - name: Validate IP Address is Correct
+      assert:
+        that:
+          - pyats_iosxr_interfaces.interface[item.port].ip_address == item.ip | ipaddr('address')
+        fail_msg: |
+          {{ item.port }} on {{ inventory_hostname }} has Wrong IP as {{ pyats_iosxr_interfaces.interface[item.port].ip_address }}
+          While Correct IP is {{ item.ip | ipaddr('address') }}
+        success_msg: |
+          {{ item.port }} on {{ inventory_hostname }} has Correct IP
+
+      loop: "{{ interfaces }}"
+      loop_control:
+        label: "{{ item.port }}"
+      register: ip_interface_state
+      when:
+        - interfaces is defined
+    
+    - name: Output the PRE/Post Diff
+      block:
+        - name: Read Pre State
+          set_fact:
+            intf_pre_state: "{{ lookup('file','{{ pyats_snapshot_dir }}/{{ inventory_hostname }}/pyats_iosxr_interfaces.json') | from_json }}"
+
+        - name: Build Diff between PRE/POST
+          set_fact:
+            intf_diff: "{{ intf_pre_state | genie_parser_diff(pyats_iosxr_interfaces) }}"
+
+        - debug: var=intf_diff
+
+      when: 
+        # - not take_snapshot
+        - phy_interface_state.failed is defined  or ip_interface_state.failed is defined
+

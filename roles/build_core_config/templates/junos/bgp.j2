@@ -1,0 +1,45 @@
+{% set bgp_peers = bgp_peers[inventory_hostname] %}
+{%  if inventory_hostname in bgp_topo.rr %}
+{%      set ibgp_group = bgp_RRCLIENT_PEER_GROUP %}
+{%  else %}
+{%      set ibgp_group = bgp_CORERR_PEER_GROUP %}
+{%  endif %}
+protocols {
+{#
+**************************************************
+###         BGP  Variables                  ######
+**************************************************
+#}
+    bgp {
+        group {{ ibgp_group }} {
+            type internal;
+{#{%          if node.bgp.ibgp.rr is not defined  %}
+            export __Ansible_Core_export;
+{%          endif %}#}
+            local-address {{ lo_ip[inventory_hostname].ip | ipaddr('address')}};
+{%          if inventory_hostname in bgp_topo.rr %}
+            cluster {{ lo_ip[inventory_hostname].ip | ipaddr('address') }};
+{%          endif %}
+{%          for af in bgp_topo.bgp_afs %}
+{%          if af == 'ipv4' %}
+            family inet {               
+                unicast;
+            }
+{%          endif %}
+{%          if af == 'l3vpn' %}
+            family inet-vpn {
+                unicast;
+            }
+{%          endif %}
+{%          if af == 'evpn' %}
+            family evpn {
+                signaling;
+            }
+{%          endif %}
+{%          endfor %}
+{%          for peer in bgp_peers %}
+            neighbor {{ lo_ip[peer.peer_name].ip | ipaddr('address')}};
+{%          endfor %}
+        }
+    }
+}

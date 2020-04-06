@@ -1,0 +1,77 @@
+---
+regions:
+  - name: nsw
+  - name: newcastle
+
+sites:
+    - name: eqx
+      description: "Equinix Data Center"
+      location: Sydney NSW
+      region: nsw
+      status: active
+    - name: den
+      description: "VOCUS Data Center"
+      location: Dension Street NewCastle 
+      region: newcastle
+    - name: str
+      description: "VOCUS Data Center"
+      location: Steel River NewCastle
+      region: newcastle
+
+device_models:
+  - name: NCS55A2
+    vendor: cisco
+    os: iosxr
+    ru: 2
+    interfaces:
+      - MgmtEth0/RP0/CPU0/0
+      - TenGigE0/0/0/[0-39]
+      - HundredGigE0/0/1/[0-3]
+
+  - name: NCS5501
+    vendor: cisco
+    os: iosxr
+    ru: 1
+    interfaces:
+      - MgmtEth0/RP0/CPU0/0
+      - TenGigE0/0/0/[0-39]
+      - HundredGigE0/0/1/[0-3]
+
+device_roles:
+  - name: Core router
+    color: red
+
+devices:
+  - name: EQX-COR-R-01
+    model: NCS55A2
+    role: Core Router
+    site: eqx
+  - name: EQX-COR-R-02
+    model: NCS55A2
+    role: Core Router
+    site: eqx
+  - name: STR-COR-R-01
+    model: NCS5501
+    role: Core Router
+    site: str
+  - name: STR-COR-R-02
+    model: NCS5501
+    role: Core Router
+    site: str
+  - name: DEN-COR-R-01
+    model: NCS5501
+    role: Core Router
+    site: den
+  - name: DEN-COR-R-02
+    model: NCS5501
+    role: Core Router
+    site: den
+  - name: DEN-COR-R-03
+    model: NCS5501
+    role: Core Router
+    site: den
+
+
+
+
+

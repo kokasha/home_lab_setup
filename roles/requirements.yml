@@ -1,0 +1,37 @@
+---
+# Ansible Role to build a Netbox Device
+- src: git+https://oauth2:6L2HMbsGgcktEKT1yz5J@gitlab.com/countrytell/ansible_roles/build_netbox_device.git
+  scm: git
+  # version: v1.0
+  name: build_netbox_device
+
+# Ansible Role to build a Netbox IPAM
+- src: git+https://oauth2:6L2HMbsGgcktEKT1yz5J@gitlab.com/countrytell/ansible_roles/build_netbox_ipam.git
+  scm: git
+  # version: v1.0
+  name: build_netbox_ipam
+
+  # Ansible Role to build a Netbox Device Interfaces
+- src: git+https://oauth2:6L2HMbsGgcktEKT1yz5J@gitlab.com/countrytell/ansible_roles/build_netbox_device_intfs.git
+  scm: git
+  # version: v1.0
+  name: build_netbox_device_intfs
+
+  # Ansible Role to build a Netbox Device IP addresses
+- src: git+https://oauth2:6L2HMbsGgcktEKT1yz5J@gitlab.com/countrytell/ansible_roles/build_netbox_device_ips.git
+  scm: git
+  # version: v1.0
+  name: build_netbox_device_ips
+
+  # Ansible Role to Update Config Context on NetBox 
+- src: git+https://oauth2:6L2HMbsGgcktEKT1yz5J@gitlab.com/countrytell/ansible_roles/build_host_datamodel.git
+  scm: git
+  # version: v1.0
+  name: build_host_datamodel
+
+  # Ansible Role to Update Config Context on NetBox 
+- src: git+https://oauth2:6L2HMbsGgcktEKT1yz5J@gitlab.com/countrytell/ansible_roles/delete_netbox_db.git
+  scm: git
+  # version: v1.0
+  name: delete_netbox_db
+

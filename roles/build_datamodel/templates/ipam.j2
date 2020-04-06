@@ -1,0 +1,16 @@
+{% set subnets = IPAM.keys()|list %}
+{#subnets:
+{% for sub in subnets %}
+{% if 'subnet' in sub %}
+    - prefix: {{ IPAM[sub] }}
+      role: {{ sub.split('_subnet')[0] }}
+{% endif %}
+{% endfor %}#}
+
+
+
+{% for sub in subnets %}
+{% if 'subnet' not in sub %}
+{{ sub }}: '{{ IPAM[sub] }}'
+{% endif %}
+{% endfor %}

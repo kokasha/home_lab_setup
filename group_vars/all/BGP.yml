@@ -1,0 +1,62 @@
+# BEGIN ANSIBLE MANAGED BLOCK
+bgp_CORERR_PEER_GROUP: NG-IBGP-RRPEER
+bgp_RRCLIENT_PEER_GROUP: NG-IBGP-RRCLIENT
+bgp_RR_PEER_GROUP: NG-IBGP-RR
+bgp_asn: 100
+bgp_peer_rr: false
+bgp_topo:
+    bgp_afs:
+    - ipv4
+    - l3vpn
+    - evpn
+    rr:
+    - XR-P01
+
+bgp_peers:
+  MX-P02:
+    - local_as: 100
+      peer_name: XR-P01
+      remote_as: 100
+      type: rr
+  MX-P03:
+    - local_as: 100
+      peer_name: XR-P01
+      remote_as: 100
+      type: rr
+  MX-PE03:
+    - local_as: 100
+      peer_name: XR-P01
+      remote_as: 100
+      type: rr
+  MX-PE04:
+    - local_as: 100
+      peer_name: XR-P01
+      remote_as: 100
+      type: rr
+  XR-P01:
+    - local_as: 100
+      peer_name: MX-P02
+      remote_as: 100
+      type: rr_client
+    - local_as: 100
+      peer_name: MX-P03
+      remote_as: 100
+      type: rr_client
+    - local_as: 100
+      peer_name: MX-PE03
+      remote_as: 100
+      type: rr_client
+    - local_as: 100
+      peer_name: MX-PE04
+      remote_as: 100
+      type: rr_client
+    - local_as: 100
+      peer_name: XR-PE01
+      remote_as: 100
+      type: rr_client
+  XR-PE01:
+    - local_as: 100
+      peer_name: XR-P01
+      remote_as: 100
+      type: rr
+# END ANSIBLE MANAGED BLOCK

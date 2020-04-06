@@ -1,0 +1,5 @@
+---
+inv_dir: ./inventory
+group_vars_dir: group_vars
+host_vars_dir: host_vars
+env: dev

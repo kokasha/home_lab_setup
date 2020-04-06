@@ -1,0 +1,3 @@
+---
+# defaults file for cisco.prefix_list_manage
+prefix_list_db: db_prefix_list

@@ -1,0 +1,149 @@
+!
+class-map match-any CONTROL-CLASS-IN
+ match mpls experimental topmost 6 7
+ match dscp cs6 cs7
+ end-class-map
+!
+class-map match-any REALTIME-CLASS-IN
+ match mpls experimental topmost 5 
+ match dscp ef cs5
+ end-class-map
+!
+class-map match-any CRITICAL-CLASS-IN
+ match mpls experimental topmost 3 
+ match dscp af31 af32 af33 cs3
+ end-class-map
+!
+class-map match-any BUSINESS-CLASS-IN
+ match mpls experimental topmost 2
+ match dscp af21 af22 af23 cs2
+ end-class-map
+!
+class-map match-any CONTROL-CLASS-OUT
+ match traffic-class 6 
+ end-class-map
+! 
+class-map match-any REALTIME-CLASS-OUT
+ match traffic-class 5 
+ end-class-map
+!
+class-map match-any CRITICAL-CLASS-OUT
+ match traffic-class 3 
+ end-class-map
+!
+class-map match-any BUSINESS-CLASS-OUT
+ match traffic-class 2 
+ end-class-map
+!
+policy-map QOS-EDGE-IN
+ description Edge Ingress QoS Policy
+ class CONTROL-CLASS-IN
+  set mpls experimental imposition 6
+  set traffic-class 6
+ ! 
+ class REALTIME-CLASS-IN
+  set mpls experimental imposition 5
+  set traffic-class 5
+ ! 
+ class CRITICAL-CLASS-IN
+  set mpls experimental imposition 3
+  set traffic-class 3
+ ! 
+ class BUSINESS-CLASS-IN
+  set mpls experimental imposition 2
+  set traffic-class 2
+  set discard-class 2
+! 
+ class class-default
+  set traffic-class 0
+  set discard-class 0
+ ! 
+!
+policy-map QOS-EDGE-OUT
+ description Edge Egress QoS Policy
+ class CONTROL-CLASS-OUT
+  shape average percent 5 
+  queue-limit 500 us 
+  priority level 1
+ ! 
+ class REALTIME-CLASS-OUT
+  queue-limit 500 us 
+  shape average percent 20 
+  priority level 2 
+ ! 
+ class CRITICAL-CLASS-OUT
+  bandwidth percent 20 
+  queue-limit 100 ms 
+ ! 
+ class BUSINESS-CLASS-OUT
+  bandwidth percent 30
+  queue-limit 100 ms 
+  random-detect discard-class 2 20 ms 40 ms
+!
+ class class-default
+  bandwidth percent 25
+  queue-limit 100 ms 
+  random-detect discard-class 0 40 ms 60 ms 
+ ! 
+!
+policy-map QOS-CORE-IN
+ description Core Ingress QoS Policy
+ class CONTROL-CLASS-IN
+  set traffic-class 6
+ ! 
+ class REALTIME-CLASS-IN
+  set traffic-class 5
+! 
+ class CRITICAL-CLASS-IN
+  set traffic-class 3
+ ! 
+ class BUSINESS-CLASS-IN
+  set traffic-class 2
+  set discard-class 2
+! 
+ class class-default
+  set traffic-class 0
+  set discard-class 0
+ ! 
+!
+policy-map QOS-CORE-OUT
+ description Core Egress QoS Policy
+ class CONTROL-CLASS-OUT
+  shape average percent 5 
+  queue-limit 500 us 
+  priority level 1 
+ ! 
+ class REALTIME-CLASS-OUT
+  queue-limit 500 us 
+  shape average percent 20 
+  priority level 2 
+  ! 
+ class CRITICAL-CLASS-OUT
+  bandwidth percent 20 
+  queue-limit 100 ms 
+ ! 
+ class BUSINESS-CLASS-OUT
+  bandwidth percent 30
+  queue-limit 100 ms 
+  random-detect discard-class 2 20 ms 40 ms 
+ ! 
+ class class-default
+  bandwidth percent 25
+  queue-limit 100 ms 
+  random-detect discard-class 0 40 ms 60 ms 
+ ! 
+!
+{%  for port in infra_links %}
+{%      if 'PHY' in port.description %}
+!
+interface {{ port.intf }}
+{%          if  port.old_core is defined and port.old_core %}
+ service-policy input QOS-EDGE-IN
+ service-policy output QOS-EDGE-OUT
+{%          else %}
+ service-policy input QOS-CORE-IN
+ service-policy output QOS-CORE-OUT 
+{%          endif %}
+{%       endif %}
+!
+{% endfor %}

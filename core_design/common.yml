@@ -1,0 +1,104 @@
+MGMT:
+  dns_servers:
+    - 27.124.97.7
+    - 27.124.98.7
+
+  ntp_servers:
+    - 10.100.0.61
+
+  tacacs_servers:
+    - 45.113.196.25
+
+  logging_servers:
+    - 10.100.0.61
+    
+  snmp_servers:
+    - 10.100.0.61
+
+  mgmt_prefixes:
+    - 192.168.0.0/24
+    - 10.8.0.0/24
+           
+  oob_mgmt_vrf: MGMT
+  snmp_community: ccbnet
+  snmp_traps: false
+  snmp_version: 2c
+  root_pwd: '1$eJ/330n2$0RGSTYVvjzW3kDzK9rIX50'
+  local_users:
+    - username: ansible
+      passwd: '14161C180506262E757A60' # ansible123
+      hash: '$1$uO86FQk7$foNS0XuNOpUoOjpY9xzjp0' # For Juniper Nodes
+    # - username: admin
+    #   passwd: '070E25414707' # admin
+  
+INTFs:
+  mtu: 
+  # WIP: We are using MTU = 4476 since XRv doesn't support MTU > 9000
+  # WIP: Will change it in Prod
+    core: 4476
+    mgmt: 1500
+  intf_down: 0
+  intf_up: 1000
+  bfd_enabled: false
+  bfd_interval: 300
+  bfd_multiplier: 3
+  lldp_enabled: true
+    
+OSPF:
+  ospf_area: 0
+  ospf_pid: 100
+  ospf_ref_link_speed: 1000  # 1T reference Link Speed
+  ospf_hash: 0802435B070D170E264A20281A0B373F6327264A564651
+
+BGP:
+  bgp_asn: 55811
+  bgp_peer_rr: true
+  bgp_topo:
+    rr:
+      - EQX-COR-R-01
+      - STR-COR-R-01
+
+    bgp_afs:
+      - ipv4
+      - l3vpn
+      - evpn
+  bgp_RR_PEER_GROUP: NG-IBGP-RR
+  bgp_CORERR_PEER_GROUP: NG-IBGP-RRPEER
+  bgp_RRCLIENT_PEER_GROUP: NG-IBGP-RRCLIENT
+
+MPLS:
+  sr_enabled: true
+  sr_gsid: 16000
+  sr_gsid_jnpr: 7000
+  sr_intf_sid: 24000
+  sr_mapping_prefixes:
+    - 172.17.248.1/32
+    - 172.17.248.2/32
+    - 172.17.248.3/32
+    - 172.17.248.30/32
+
+SECURITY:
+  ACLs:
+    - name: ACL-SNMP-ACCESS
+      role: snmp
+      rules:
+        - src: 10.100.0.0/23
+          action: permit
+
+    - name: ACL-SSH-ACCESS
+      role: ssh
+      rules:
+        - src: "{{ MGMT.mgmt_prefixes }}"
+          action: permit        
+
+ROUTE_POLICY:
+  PREFIX_LISTs:
+    EQX-COR-R-01:
+      - name: PS-MGMT-ROUTES
+        routes: "{{ MGMT.mgmt_prefixes }}"
+
+  RPLs:
+    EQX-COR-R-01:
+      - name: RP-OSPF-EXPORT
+        match: PS-MGMT-ROUTES
+        set: tag 100

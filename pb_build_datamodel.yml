@@ -1,0 +1,23 @@
+---
+- name: Build Folder Structure
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: local
+    env: prod
+  vars_files:
+    - core_design/net_design.yml
+
+  # pre_tasks:
+  #   - name: SYS >> Read Common Parameters File
+  #     include_vars: "{{'core_design/'  + env + '/common.yml' }}"
+  #     run_once: yes
+  #     tags: always
+
+  #   - name: SYS >> Read Network Topology Parameters File
+  #     include_vars: "{{'core_design/'  + env + '/net_topo.yml' }}"
+  #     run_once: yes
+  #     tags: always
+
+  roles:
+    - build_datamodel

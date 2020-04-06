@@ -1,0 +1,52 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    ios_prefix_list: |
+      ip prefix-list ANSIBEL_DEFAULT:
+        count: 4, range entries: 3, sequences: 5 - 20, refcount: 2
+        seq 5 permit 0.0.0.0/0 (hit count: 0, refcount: 1)
+        seq 10 permit 0.0.0.0/0 ge 24 le 24 (hit count: 0, refcount: 0)
+        seq 15 permit 0.0.0.0/0 ge 26 le 28 (hit count: 0, refcount: 0)
+        seq 20 permit 0.0.0.0/0 le 8 (hit count: 0, refcount: 0)
+      ip prefix-list ANSIBLE_TEST:
+        count: 4, range entries: 3, sequences: 5 - 20, refcount: 1
+        seq 5 permit 10.1.0.0/24 (hit count: 0, refcount: 4)
+        seq 10 permit 10.1.1.0/24 ge 28 (hit count: 0, refcount: 1)
+        seq 15 permit 10.1.2.0/24 ge 25 le 28 (hit count: 0, refcount: 1)
+        seq 20 permit 10.2.0.0/16 le 20 (hit count: 0, refcount: 1)
+
+    iosxr_prefix_set: |
+      prefix-set M23PEPGI-OSPF231-GI-PEP-MRI-APN-IN
+        10.127.91.224/29 le 32,
+        10.127.218.80/28 le 32,
+        10.127.218.96/28 le 32,
+        10.116.39.0/24 le 28,
+        10.116.38.248/30 le 32,
+        10.116.38.252/32,
+        10.116.38.253/32,
+        10.116.38.25/32,
+        10.116.40.192/28,
+        10.116.40.208/28,
+        10.127.221.0/24 le 30,
+        10.116.39.192/26 le 32,
+        10.116.251.0/24 le 29
+      end-set
+      !
+  roles:
+    - ansible-pyats
+  tasks:
+    - name: Parse Data using PyATS
+      set_fact:
+        pyats_iosxr_prefix: "{{ iosxr_prefix_set | pyats_parser('show rpl prefix-set','iosxr') }}"
+        pyats_ios_prefix: "{{ ios_prefix_list | pyats_parser('show ip prefix-list detail','ios') }}"
+
+    - name: Save PyATS IOSXR prefix-list data
+      copy:
+        content: "{{ pyats_iosxr_prefix | to_nice_json}}"
+        dest: pyats_iosxr_prefix.json
+
+    - name: Save PyATS IOS prefix-list data
+      copy:
+        content: "{{ pyats_ios_prefix | to_nice_json}}"
+        dest: pyats_ios_prefix.json

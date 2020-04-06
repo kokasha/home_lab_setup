@@ -1,0 +1,34 @@
+!
+hostname {{inventory_hostname}}
+telnet vrf default ipv4 server max-servers 100
+!
+{% for user in local_users %}
+username {{user.username}}
+ group sysadmin
+ password 7 {{user.passwd}}
+{% endfor %}
+!
+{%  if oob_mgmt_vrf is defined %}
+vrf {{ oob_mgmt_vrf }}
+{%  endif%}
+!
+router static
+{%  if oob_mgmt_vrf is defined %}
+ vrf {{ oob_mgmt_vrf }}
+{%  endif%}
+  address-family ipv4 unicast
+{%      for route in mgmt_prefixes %}
+   {{ route }} {{  oob_mgmt_net[inventory_hostname].ip | ipv4(1) | ipaddr('address') }}
+{%      endfor %}
+!
+xml agent tty
+ iteration off
+!
+xml agent
+!
+ssh server v2
+ssh server vrf default
+{%  if oob_mgmt_vrf is defined %}
+ssh server vrf {{ oob_mgmt_vrf }}
+{%  endif%}ssh server logging
+ssh server rate-limit 600

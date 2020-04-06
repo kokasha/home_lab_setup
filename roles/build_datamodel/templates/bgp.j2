@@ -1,0 +1,30 @@
+bgp_peers:
+{% for host in play_hosts|sort %}
+  {{ host }}:
+{# *** Build Data for BGP Clients for the RR node *** #}
+{%  if host in BGP.bgp_topo.rr %}
+{%    for peer in play_hosts|sort if peer not in BGP.bgp_topo.rr %}
+    - local_as: {{ BGP.bgp_asn }}
+      peer_name: {{ peer }}
+      remote_as: {{ BGP.bgp_asn }}
+      type: rr_client
+{%    endfor %}
+{# *** Build Data for BGP Full Mesh for the RR node *** #}
+{%    if (host in BGP.bgp_topo.rr) and BGP.bgp_peer_rr %}
+{%      for peer in BGP.bgp_topo.rr if host != peer %}
+    - local_as: {{ BGP.bgp_asn }}
+      peer_name: {{ peer }}
+      remote_as: {{ BGP.bgp_asn }}
+      type: rr_fullmesh
+{%      endfor %}
+{%    endif %}
+{%  else %}
+{# *** Build Data for RR Clients to peer with the RR nodes *** #}
+{%    for peer in play_hosts|sort if peer in BGP.bgp_topo.rr %}
+    - local_as: {{ BGP.bgp_asn }}
+      peer_name: {{ peer }}
+      remote_as: {{ BGP.bgp_asn }}
+      type: rr
+{%    endfor %}
+{%  endif %}
+{% endfor %}

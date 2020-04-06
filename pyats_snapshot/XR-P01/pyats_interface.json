@@ -1,0 +1,46 @@
+{
+    "interface": {
+        "GigabitEthernet0/0/0/0": {
+            "interface_status": "Up",
+            "ip_address": "172.20.1.254",
+            "protocol_status": "Up",
+            "vrf_name": "default"
+        },
+        "GigabitEthernet0/0/0/1": {
+            "interface_status": "Up",
+            "ip_address": "172.20.1.0",
+            "protocol_status": "Up",
+            "vrf_name": "default"
+        },
+        "GigabitEthernet0/0/0/2": {
+            "interface_status": "Up",
+            "ip_address": "172.20.1.5",
+            "protocol_status": "Up",
+            "vrf_name": "default"
+        },
+        "GigabitEthernet0/0/0/3": {
+            "interface_status": "Up",
+            "ip_address": "172.20.1.9",
+            "protocol_status": "Up",
+            "vrf_name": "default"
+        },
+        "GigabitEthernet0/0/0/4": {
+            "interface_status": "Shutdown",
+            "ip_address": "unassigned",
+            "protocol_status": "Down",
+            "vrf_name": "default"
+        },
+        "Loopback0": {
+            "interface_status": "Up",
+            "ip_address": "10.100.1.1",
+            "protocol_status": "Up",
+            "vrf_name": "default"
+        },
+        "MgmtEth0/RP0/CPU0/0": {
+            "interface_status": "Up",
+            "ip_address": "172.20.5.2",
+            "protocol_status": "Up",
+            "vrf_name": "MGMT"
+        }
+    }
+}

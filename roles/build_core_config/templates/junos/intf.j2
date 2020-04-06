@@ -1,0 +1,53 @@
+{#
+**************************************************
+###         Interfaces configuration        ######
+**************************************************
+#}
+interfaces {
+{% for intf in p2p_ip[inventory_hostname] | sort(attribute='port') %}
+    {{ intf.port.split('.')[0] }} {
+        description "PEER:{{intf.peer}}|PPORT: {{intf.pport}}"
+        mtu {{ mtu.core | default('1500') }};
+{%      if intf.vlan  is defined and intf.vlan != 0 %}
+        vlan-tagging;
+        encapsulation flexible-ethernet-services;
+        unit {{intf.vlan}} {
+            vlan-id {{intf.vlan}};
+            family inet {
+                address {{intf.ip}};
+            }
+            family mpls;
+        }
+    }
+{%      else %}
+        unit 0 {
+            family inet {
+                address {{intf.ip}};
+            }
+            family mpls;
+        }
+    }
+{%      endif %}
+{% endfor %}
+{%  if lo_ip[inventory_hostname] is defined %}
+    lo0 {
+        unit 0 {
+            family inet {
+                address {{lo_ip[inventory_hostname].ip}};
+{%              if lo_ip[inventory_hostname].state == 'down'%}
+                disable;
+{%              endif %}
+            }
+        }
+    }
+{%  endif %}
+{%  if oob_mgmt_net[inventory_hostname] is defined %}
+    {{oob_mgmt_net[inventory_hostname].port}} {
+        unit 0 {
+            family inet {
+                address {{oob_mgmt_net[inventory_hostname].ip}};
+            }
+        }
+    }
+{%  endif %}
+}

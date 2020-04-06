@@ -1,0 +1,19 @@
+{% macro BGP_AF() %}
+{%    if 'ipv4' in bgp_topo.bgp_afs %}
+  address-family ipv4 unicast
+  !
+{%    endif %}
+{%    if 'l3vpn' in bgp_topo.bgp_afs %}
+  address-family vpnv4 unicast
+  !
+{%    endif %}
+{%    if 'evpn' in bgp_topo.bgp_afs %}
+  address-family l2vpn evpn
+  !
+{%    endif %}
+{%  endmacro %}
+
+ neighbor-group 
+  remote-as 
+  update-source Loopback0
+{{ BGP_AF() }}

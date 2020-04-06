@@ -1,0 +1,13 @@
+ip prefix-list ANSIBEL_DEFAULT:
+   count: 4, range entries: 3, sequences: 5 - 20, refcount: 1
+   seq 5 permit 0.0.0.0/0 (hit count: 0, refcount: 1)
+   seq 10 permit 0.0.0.0/0 ge 24 le 24 (hit count: 0, refcount: 0)
+   seq 15 permit 0.0.0.0/0 ge 26 le 28 (hit count: 0, refcount: 0)
+   seq 20 permit 0.0.0.0/0 le 8 (hit count: 0, refcount: 0)
+ip prefix-list ANSIBLE_TEST:
+   count: 5, range entries: 4, sequences: 5 - 25, refcount: 2
+   seq 5 permit 10.1.0.0/24 (hit count: 0, refcount: 4)
+   seq 10 permit 10.1.1.0/24 ge 28 (hit count: 0, refcount: 1)
+   seq 15 permit 10.1.2.0/24 ge 25 le 28 (hit count: 0, refcount: 1)
+   seq 20 permit 10.2.0.0/16 le 20 (hit count: 0, refcount: 1)
+   seq 25 permit 10.1.0.0/16 ge 20 le 24 (hit count: 0, refcount: 1)

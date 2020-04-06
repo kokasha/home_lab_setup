@@ -1,0 +1,81 @@
+{%  macro BGP_AF(is_rr=false) %}
+{%    if 'ipv4' in bgp_topo.bgp_afs %}
+  address-family ipv4 unicast
+{%      if is_rr %}
+  route-reflector-client
+{%      endif %}
+  !
+{%    endif %}
+{%    if 'l3vpn' in bgp_topo.bgp_afs %}
+  address-family vpnv4 unicast
+{%      if is_rr %}
+  route-reflector-client
+{%      endif %}
+  !
+{%    endif %}
+{%    if 'evpn' in bgp_topo.bgp_afs %}
+  address-family l2vpn evpn
+{%      if is_rr %}
+  route-reflector-client
+{%      endif %}
+  !
+{%    endif %}
+{%  endmacro %}
+{%  set core_bgp_peers = bgp_peers[inventory_hostname] %}
+!
+router bgp {{bgp_asn}}
+ bgp router-id {{ lo_ip[inventory_hostname].ip.split('/')[0] }}
+{{ BGP_AF() }}
+{# ********************************* #}
+{# ******* For RR Nodes ************ #}
+{# ********************************* #}
+{%  if inventory_hostname in bgp_topo.rr %}
+ !
+ neighbor-group {{ bgp_RRCLIENT_PEER_GROUP}}
+   remote-as {{ bgp_asn }}
+   update-source Loopback0
+{{ BGP_AF(is_rr=true) }}
+{# ******* Build Core IBGP Full Mesh ************ #}
+{%    if bgp_peer_rr %}
+ !
+ neighbor-group {{ bgp_CORERR_PEER_GROUP }}
+   remote-as {{ bgp_asn }}
+   update-source Loopback0
+{{ BGP_AF() }}
+ !
+{%      for peer in core_bgp_peers | selectattr('type','equalto','rr_fullmesh') %}
+{%        set peer_ip = lo_ip[peer.peer_name].ip | ipaddr('address') %}
+ neighbor {{ peer_ip }}
+  use neighbor-group {{ bgp_CORERR_PEER_GROUP }}
+  description {{ peer.peer_name }}
+  !
+{%      endfor %}
+{%    endif %}
+{# ************* Build BGP RR Peers ******** #}
+{%    for peer in core_bgp_peers | selectattr('type','equalto','rr_client') %}
+{%      set peer_ip = lo_ip[peer.peer_name].ip | ipaddr('address') %}
+ neighbor {{ peer_ip }}
+  use neighbor-group {{ bgp_RRCLIENT_PEER_GROUP }}
+  description {{ peer.peer_name }}
+  !
+{%    endfor %}
+{% endif %}
+{# ***************************************** #}
+{# ******* For RR Clients Nodes ************ #}
+{# ***************************************** #}
+{% if inventory_hostname not in bgp_topo.rr %}
+ !
+ neighbor-group {{ bgp_RR_PEER_GROUP }}
+  remote-as {{ bgp_asn }}
+  update-source Loopback0
+{{ BGP_AF() }}
+  !
+{%    for peer in core_bgp_peers %}
+{%      set peer_ip = lo_ip[peer.peer_name].ip | ipaddr('address') %}
+ neighbor {{ peer_ip }}
+  use neighbor-group {{ bgp_RR_PEER_GROUP }}
+  description {{ peer.peer_name }}
+  !
+{%    endfor %}
+{% endif %} 
+!

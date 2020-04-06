@@ -1,0 +1,65 @@
+{% set core_subnet = IPAM.subnets | selectattr('role','equalto','core_p2p') | list | first %}
+{% set loopback_subnet = IPAM.subnets | selectattr('role','equalto','core_loopback') | list | first %}
+{% set oob_mgmt_subnets = IPAM.subnets | selectattr('role','equalto','oob_mgmt') | list %}
+
+p2p_ip:
+{% set core_links = core_p2p_links | dict2items %}
+{%  for node in play_hosts %}
+{%    set links_a = core_links | selectattr('value.node_a','equalto',node) | list  %}
+{%    set links_b = core_links | selectattr('value.node_b','equalto',node) | list  %}
+{%    if links_a != [] or links_b != [] %}
+  {{ node }}:
+{%      for l in links_a if links_a != [] %}
+{%        set link_id = l.key - 1 %}
+{%        set link = l.value %}
+{%        set network = core_subnet.prefix | ipsubnet (IPAM.p2p_netmask, link_id) %}
+    - port: {{ link.intf_a }}
+      ip: {{ network | ipv4(0)| ipaddr('address') + '/' + IPAM.p2p_netmask|string }}
+      peer: {{ link.node_b }}
+      peer_ip: {{ network | ipv4(1)| ipaddr('address') + '/' + IPAM.p2p_netmask|string}}
+      pport: {{ link.intf_b }}
+{%    if link.speed is defined %}
+      speed: {{ link.speed }}
+{%    endif %}
+{%      endfor %}
+{%      for l in links_b if links_b != [] %}
+{%        set link_id = l.key - 1 %}
+{%        set link = l.value %}
+{%        set network = core_subnet.prefix | ipsubnet (IPAM.p2p_netmask, link_id) %}
+    - port: {{ link.intf_b }}
+      ip: {{ network | ipv4(1)| ipaddr('address') + '/' + IPAM.p2p_netmask|string}}
+      peer: {{ link.node_a }}
+      peer_ip: {{ network | ipv4(0)| ipaddr('address') + '/' + IPAM.p2p_netmask|string}}
+      pport: {{ link.intf_a }}
+{%    if link.speed is defined %}
+      speed: {{ link.speed }}
+{%    endif %}
+{%      endfor %}
+{%    endif %}
+
+{%  endfor %}
+
+lo_ip:
+{%  for host in loopback_intfs %}
+  {{ host.node }}: { port: {{ host.intf }}, ip: {{ loopback_subnet.prefix | ipv4(loop.index) | ipaddr('address') + '/32' }}, state: {{ state | default('up') }}}
+{%  endfor %}
+
+{% if oob_mgmt_intfs is defined %}
+oob_mgmt_net:
+{% for host in oob_mgmt_intfs %}
+  {{ host.node}} : { port: {{ host.intf}}, ip: {{ hostvars[host.node].ansible_host + '/' + IPAM.oob_netmask|string }}}
+{% endfor %}
+{% endif %}
+
+{#{% if inband_mgmt_subnets %}
+inband_mgmt_net:
+{% for host in play_hosts|sort %}
+{%    set site = INVENTORY.sites | map(attribute='name') | intersect (hostvars[host].group_names)| first %}
+{%    set site_mgmt_prefix = inband_mgmt_subnets | selectattr('site','equalto',site) | map(attribute='prefix') | first %}
+{%    if 'Loopback' in INTFs.inband_mgmt_intf %}
+  {{ host}}: { port: {{ INTFs.inband_mgmt_intf}}, ip: {{ site_mgmt_prefix | ipv4(INVENTORY.device_id[host].mgmt) | ipaddr('address') + '/32' }} }
+{%    else %}
+  {{ host}}: { port: {{ INTFs.inband_mgmt_intf}}, ip: {{ site_mgmt_prefix | ipv4(INVENTORY.device_id[host].mgmt)}}}
+{%    endif %}
+{% endfor %}
+{% endif %}#}

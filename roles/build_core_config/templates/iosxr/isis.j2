@@ -1,0 +1,28 @@
+{% set node_id = (lo_ip[inventory_hostname].ip | ipaddr('address')).split('.')[-1] %}
+{% set isis_node_id = '.0000.000.' + ':0>4'.format(node_id) + '.00' %}
+!
+router isis {{ isis_pid }}
+ net {{ isis_area + isis_node_id }}
+ address-family ipv4 unicast
+  metric-style wide
+{%  if sr_enabled is defined and sr_endabled %}
+  segment-routing mpls
+{%  endif %}
+ !
+ interface Loopback0
+  passive
+  address-family ipv4 unicast
+{%  if sr_enabled is defined and sr_endabled %}
+   prefix-sid absolute 16001
+{%  endif %}
+  !
+{%  for p in p2p_ip[inventory_hostname] %}
+ !
+ interface {{ p.port }}
+  point-to-point
+  address-family ipv4 unicast
+   metric {{ p.metric | default('1000') }}
+  !
+ !
+{%  endfor %}
+!

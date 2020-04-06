@@ -1,0 +1,141 @@
+# BEGIN ANSIBLE MANAGED BLOCK
+
+p2p_ip:
+  XR-P01:
+    - port: GigabitEthernet0/0/0/0
+      ip: 172.20.1.0/31
+      peer: MX-P02
+      peer_ip: 172.20.1.1/31
+      pport: ge-0/0/0
+      speed: 1g
+    - port: GigabitEthernet0/0/0/1
+      ip: 172.20.1.2/31
+      peer: MX-P03
+      peer_ip: 172.20.1.3/31
+      pport: ge-0/0/0
+      speed: 1g
+    - port: GigabitEthernet0/0/0/2
+      ip: 172.20.1.7/31
+      peer: XR-PE01
+      peer_ip: 172.20.1.6/31
+      pport: GigabitEthernet0/0/0/0
+      speed: 1g
+
+  MX-P02:
+    - port: ge-0/0/1
+      ip: 172.20.1.4/31
+      peer: MX-P03
+      peer_ip: 172.20.1.5/31
+      pport: ge-0/0/1
+      speed: 1g
+    - port: ge-0/0/0
+      ip: 172.20.1.1/31
+      peer: XR-P01
+      peer_ip: 172.20.1.0/31
+      pport: GigabitEthernet0/0/0/0
+      speed: 1g
+    - port: ge-0/0/4
+      ip: 172.20.1.15/31
+      peer: MX-PE03
+      peer_ip: 172.20.1.14/31
+      pport: ge-0/0/0
+      speed: 1g
+    - port: ge-0/0/5
+      ip: 172.20.1.19/31
+      peer: MX-PE04
+      peer_ip: 172.20.1.18/31
+      pport: ge-0/0/0
+      speed: 1g
+
+  MX-P03:
+    - port: ge-0/0/0
+      ip: 172.20.1.3/31
+      peer: XR-P01
+      peer_ip: 172.20.1.2/31
+      pport: GigabitEthernet0/0/0/1
+      speed: 1g
+    - port: ge-0/0/1
+      ip: 172.20.1.5/31
+      peer: MX-P02
+      peer_ip: 172.20.1.4/31
+      pport: ge-0/0/1
+      speed: 1g
+    - port: ge-0/0/2
+      ip: 172.20.1.9/31
+      peer: XR-PE01
+      peer_ip: 172.20.1.8/31
+      pport: GigabitEthernet0/0/0/1
+      speed: 1g
+    - port: ge-0/0/4
+      ip: 172.20.1.17/31
+      peer: MX-PE03
+      peer_ip: 172.20.1.16/31
+      pport: ge-0/0/1
+      speed: 1g
+    - port: ge-0/0/5
+      ip: 172.20.1.21/31
+      peer: MX-PE04
+      peer_ip: 172.20.1.20/31
+      pport: ge-0/0/1
+      speed: 1g
+
+  XR-PE01:
+    - port: GigabitEthernet0/0/0/0
+      ip: 172.20.1.6/31
+      peer: XR-P01
+      peer_ip: 172.20.1.7/31
+      pport: GigabitEthernet0/0/0/2
+      speed: 1g
+    - port: GigabitEthernet0/0/0/1
+      ip: 172.20.1.8/31
+      peer: MX-P03
+      peer_ip: 172.20.1.9/31
+      pport: ge-0/0/2
+      speed: 1g
+
+  MX-PE03:
+    - port: ge-0/0/0
+      ip: 172.20.1.14/31
+      peer: MX-P02
+      peer_ip: 172.20.1.15/31
+      pport: ge-0/0/4
+      speed: 1g
+    - port: ge-0/0/1
+      ip: 172.20.1.16/31
+      peer: MX-P03
+      peer_ip: 172.20.1.17/31
+      pport: ge-0/0/4
+      speed: 1g
+
+  MX-PE04:
+    - port: ge-0/0/0
+      ip: 172.20.1.18/31
+      peer: MX-P02
+      peer_ip: 172.20.1.19/31
+      pport: ge-0/0/5
+      speed: 1g
+    - port: ge-0/0/1
+      ip: 172.20.1.20/31
+      peer: MX-P03
+      peer_ip: 172.20.1.21/31
+      pport: ge-0/0/5
+      speed: 1g
+
+
+lo_ip:
+  XR-P01: { port: Loopback0, ip: 10.100.1.1/32, state: up}
+  MX-P02: { port: Loopback0, ip: 10.100.1.2/32, state: up}
+  MX-P03: { port: Loopback0, ip: 10.100.1.3/32, state: up}
+  XR-PE01: { port: Loopback0, ip: 10.100.1.4/32, state: up}
+  MX-PE03: { port: Loopback0, ip: 10.100.1.5/32, state: up}
+  MX-PE04: { port: Loopback0, ip: 10.100.1.6/32, state: up}
+
+oob_mgmt_net:
+  XR-P01 : { port: MgmtEth0/RP0/CPU0/0, ip: 172.20.5.2/28}
+  MX-P02 : { port: fxp0, ip: 172.20.5.3/28}
+  MX-P03 : { port: fxp0, ip: 172.20.5.4/28}
+  XR-PE01 : { port: MgmtEth0/RP0/CPU0/0, ip: 172.20.5.5/28}
+  MX-PE03 : { port: fxp0, ip: 172.20.5.7/28}
+  MX-PE04 : { port: fxp0, ip: 172.20.5.8/28}
+
+# END ANSIBLE MANAGED BLOCK

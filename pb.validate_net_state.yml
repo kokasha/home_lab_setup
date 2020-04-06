@@ -1,0 +1,15 @@
+---
+- name: Validate Network State Using Cisco PyATS
+  hosts: iosxr
+  vars:
+    ansible_connection: local
+    take_snapshot: true
+    pyats_snapshot_dir: pyats_snapshot
+  roles:
+    - ansible-pyats
+  tasks:
+    - name: Validate Network State
+      import_role:
+        name: pyats_validate
+      vars:
+        interfaces: "{{ p2p_ip[inventory_hostname] }}"

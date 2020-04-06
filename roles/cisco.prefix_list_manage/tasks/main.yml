@@ -1,0 +1,51 @@
+---
+# tasks file for cisco.prefix_list_manage
+- name: Collect prefix-list data Devices
+  debug: msg="TEST"
+
+- name: CI_TEST >> Read TEST Data
+  set_fact:
+    ios_prefix_list: "{{ lookup('file','tests/data/ios_prefix_list.txt') }}"
+  when: not pfx_db
+
+- name: Parse prefix-list using Cisco PyATS
+  set_fact:
+    pyats_prefix_lists: "{{ ios_prefix_list | pyats_parser('show ip prefix-list detail','ios') }}"
+  when: not pfx_db
+
+- name: Build Ansible Fact
+  set_fact:
+    ansible_prefix_lists: "{{ pyats_prefix_lists | filter_pyats_ios_pfx_list }}"
+  when: not pfx_db
+
+- name: Create Prefix List Database
+  file:
+    path: "{{ prefix_list_db }}"
+    state: directory
+  when: not pfx_db
+
+- name: Create Prefix List
+  copy:
+    content: "{{ ansible_prefix_lists | to_nice_yaml }}"
+    dest: "{{prefix_list_db }}/{{ inventory_hostname }}.yml"
+  when: not pfx_db
+
+# - name: Build and Save prefix_lists Data Structure
+#   debug: var=ansible_prefix_lists
+
+- name: Find All Matching Prefixes
+  set_fact:
+    # matched_prefix_lists: "{{ matched_prefix_lists | default([]) + 
+    #                           [{
+    #                             'pfx_list_name': item.key,
+    #                             'matched_entries': item.value | find_matching_entry(test_prefix)
+    #                           }]
+    #                         }}"
+    matched_prefix_lists: "{{ matched_prefix_lists | default({}) | 
+                              combine({
+                                item.key: item.value | find_matching_entry(test_prefix)
+                              })
+                            }}"
+  with_dict: "{{ ansible_prefix_lists }}"
+
+- debug: var=matched_prefix_lists

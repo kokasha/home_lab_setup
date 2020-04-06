@@ -1,0 +1,11 @@
+# BEGIN ANSIBLE MANAGED BLOCK
+bfd_enabled: false
+bfd_interval: 300
+bfd_multiplier: 3
+intf_down: 0
+intf_up: 1000
+lldp_enabled: true
+mtu:
+    core: 4476
+    mgmt: 1500
+# END ANSIBLE MANAGED BLOCK

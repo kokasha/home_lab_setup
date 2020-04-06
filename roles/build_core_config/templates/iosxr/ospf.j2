@@ -1,0 +1,43 @@
+!
+router ospf {{ ospf_pid }}
+ router-id {{lo_ip[inventory_hostname].ip.split('/')[0]}}
+ distribute link-state
+ nsr
+ timers throttle lsa all 50 100 5000
+ timers throttle spf 50 100 5000
+ address-family ipv4 unicast
+{%  if sr_enabled %}
+ segment-routing mpls
+{%    if inventory_hostname in bgp_topo.rr%}
+ segment-routing prefix-sid-map advertise-local
+{%    endif %}
+ mpls traffic-eng router-id {{ lo_ip[inventory_hostname].ip | ipaddr('address') }}
+{%  endif %}
+{#{%  if PREFIX_LISTs[inventory_hostname] is defined %}
+{%    set OSPF_EXPORT = RPLs[inventory_hostname] | selectattr('name','equalto','RP-OSPF-EXPORT') | first %}
+ redistribute static route-policy {{ OSPF_EXPORT.name }}
+{%  endif %}#}
+{%  if ospf_passwd is defined %}
+ authentication message-digest
+{%  endif %}
+ area {{ ospf_area }}
+{%  if sr_enabled %}
+  segment-routing mpls
+  mpls traffic-eng
+{%  endif %}
+  !
+{%  for p in p2p_ip[inventory_hostname] %}
+  interface {{ p.port }}
+   network point-to-point
+   cost {{ p.cost | default('1000') }}
+   authentication null
+  !
+{%  endfor %}
+  interface {{ lo_ip[inventory_hostname].port }}
+{%  set prefix_sid = sr_gsid + (lo_ip[inventory_hostname].ip.split('/')[0].split('.')[3]| int) %}
+   prefix-sid absolute {{ prefix_sid }}
+   passive enable
+   authentication null
+
+  !
+!

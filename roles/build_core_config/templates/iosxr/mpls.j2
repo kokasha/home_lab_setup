@@ -1,0 +1,53 @@
+{#!
+rsvp
+{% for intf in p2p_ip[inventory_hostname] | sort(attribute='port') %}
+ interface {{intf.port.split('.')[0]}}
+{% endfor %}
+ !
+!
+mpls traffic-eng
+{% for intf in p2p_ip[inventory_hostname] | sort(attribute='port') %}
+ interface {{intf.port.split('.')[0]}}
+{% endfor %}
+!#}
+{#{% set ldp_intfs = infra_links | selectattr('core_ldp','defined') | list %}
+{%  if ldp_intfs | length > 0 %}#}
+!
+ipv4 access-list CISCO-CORE-LOOPBACKS
+ 10 remark == ALLOW CISCO CORE LOOPBACKs TO HAVE LABEL ALLOCATION & ADVERTISEMENT==
+ 20 permit ipv4 172.17.248.128/25 any
+!
+mpls ldp
+ address-family ipv4
+  label
+   local
+    advertise
+     for CISCO-CORE-LOOPBACKS
+     explicit-null
+    !
+    allocate for CISCO-CORE-LOOPBACKS
+!
+{%  for port in infra_links %}
+{%    if port.core_ldp is defined and port.core_ldp %}
+ interface {{port.intf.split('.')[0]}}
+{%    endif %}
+{%  endfor %}
+!
+mpls oam
+!
+{% if inventory_hostname in bgp_topo.rr %}
+segment-routing
+ mapping-server
+  prefix-sid-map
+   address-family ipv4
+{%  if sr_mapping_prefixes is defined %}
+{%  for node in sr_mapping_prefixes %}
+{%    set sid_id = node.split('/')[0].split('.')[3]|int%}
+    {{ node }} {{ sr_gsid_jnpr + sid_id }}
+{%  endfor%}
+{%  endif %}
+   !
+  !
+ !
+!
+{% endif %}

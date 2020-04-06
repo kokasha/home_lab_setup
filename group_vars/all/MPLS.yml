@@ -1,0 +1,11 @@
+# BEGIN ANSIBLE MANAGED BLOCK
+sr_enabled: true
+sr_gsid: 16000
+sr_gsid_jnpr: 7000
+sr_intf_sid: 24000
+sr_mapping_prefixes:
+- 172.17.248.1/32
+- 172.17.248.2/32
+- 172.17.248.3/32
+- 172.17.248.30/32
+# END ANSIBLE MANAGED BLOCK

@@ -1,0 +1,15 @@
+# - name: Create Inventory Folder
+#   file: path={{ inv_dir }} state=directory
+#   run_once: yes
+
+# - name: Create Environment Folder
+#   file: path={{ inv_dir }}/{{ env }} state=directory
+#   run_once: yes
+
+# - name: Create group_vars folder
+#   file:  path={{ inv_dir }}/{{ env }}/{{group_vars_dir}}  state=directory
+#   run_once: yes
+
+- name: Create the All Folder
+  file: path={{ group_vars_dir }}/all state=directory
+  run_once: yes

@@ -1,0 +1,21 @@
+---
+- name: Build Folder Structure
+  hosts: localhost
+  gather_facts: no
+  vars:
+    index: '12'
+    ansible_connection: local
+    env: prod
+    bgp_topo:
+      bgp_afs:
+        - ipv4
+        - evpn
+  tasks:
+    - set_fact:
+        isis: "{{ '{:0>4}'.format(index) }}"
+    - debug:
+        msg: "{{ isis }}"
+    # - name: filgoal
+    #   template:
+    #     src: test.j2
+    #     dest: sample.txt

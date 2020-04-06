@@ -1,0 +1,32 @@
+{# Core Links #}
+{%  for p in p2p_ip[inventory_hostname] | sort(attribute='port') %}
+!
+interface {{ p.port }}
+ description "PEER: {{ p.peer }}|PPORT: {{ p.pport }}|SPEED: {{ p.speed }}"
+ ipv4 address {{p.ip| ipaddr('address')}} {{p.ip| ipaddr('netmask')}}
+ mtu {{ mtu.core | default('1500') }}
+ load-interval 30
+ no shutdown
+ lldp
+  enable
+!
+{% endfor %}
+{#  Loopback Interfaces #}
+{%  if lo_ip[inventory_hostname] is defined %}
+!
+interface {{ lo_ip[inventory_hostname].port }}
+ description "LOOPBACK0 INTF for {{ inventory_hostname }}"
+ ipv4 address {{lo_ip[inventory_hostname].ip| ipaddr('address')}} {{lo_ip[inventory_hostname].ip| ipaddr('netmask')}}
+!
+{%  endif %}
+{#  OOB MGMT Interfaces #}
+{%  if oob_mgmt_net[inventory_hostname] is defined %}
+!
+interface {{oob_mgmt_net[inventory_hostname].port}}
+{%  if oob_mgmt_vrf is defined %}
+ vrf {{ oob_mgmt_vrf }}
+{%  endif %}
+ ipv4 address {{oob_mgmt_net[inventory_hostname].ip| ipaddr('address')}} {{oob_mgmt_net[inventory_hostname].ip| ipaddr('netmask')}}
+ no shutdown
+!
+{%  endif %}

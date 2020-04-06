@@ -1,0 +1,13 @@
+- name: Create PyATS Snapshot Directory
+  file:
+    path: "{{ pyats_snapshot_dir }}/{{ inventory_hostname }}"
+    state: directory
+  when: take_snapshot
+
+- name: Validate Interfaces State
+  import_tasks: validate_interfaces.yml
+  ignore_errors: yes
+  tags: intfs
+
+# - name: Validate LLDP Peering State
+# - name: Validate OSPF Peering State

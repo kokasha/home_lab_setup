@@ -1,0 +1,25 @@
+# BEGIN ANSIBLE MANAGED BLOCK
+dns_servers:
+- 27.124.97.7
+- 27.124.98.7
+local_users:
+-   hash: $1$uO86FQk7$foNS0XuNOpUoOjpY9xzjp0
+    passwd: 14161C180506262E757A60
+    username: ansible
+logging_servers:
+- 10.100.0.61
+mgmt_prefixes:
+- 192.168.0.0/24
+- 10.8.0.0/24
+ntp_servers:
+- 10.100.0.61
+oob_mgmt_vrf: MGMT
+root_pwd: 1$eJ/330n2$0RGSTYVvjzW3kDzK9rIX50
+snmp_community: ccbnet
+snmp_servers:
+- 10.100.0.61
+snmp_traps: false
+snmp_version: 2c
+tacacs_servers:
+- 45.113.196.25
+# END ANSIBLE MANAGED BLOCK

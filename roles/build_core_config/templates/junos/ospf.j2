@@ -1,0 +1,35 @@
+protocols {
+{#
+**************************************************
+###         OSPF  Variables                  ######
+**************************************************
+#}
+    ospf {
+        area {{ospf_area}} {
+{%          for intf in p2p_ip[inventory_hostname]|sort(attribute='port') %}
+            interface {{ intf.port }} {
+                interface-type p2p;
+                metric {{intf.cost | default(1000)}};
+            }
+{%          endfor %}
+            interface lo0.0 {
+                passive;
+            }
+        }
+    }
+{#
+**************************************************
+###         MPLS and LLDP  Variables        ######
+**************************************************
+#}
+    mpls {
+{%      for intf in p2p_ip[inventory_hostname]|sort(attribute='port') %}
+        interface {{intf.port}};
+{%      endfor %}
+    }
+    lldp {
+{%      for intf in p2p_ip[inventory_hostname]|sort(attribute='port') %}
+        interface {{intf.port}};
+{%      endfor %}
+    }
+}

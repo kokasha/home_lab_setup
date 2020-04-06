@@ -1,0 +1,79 @@
+---
+- name: Validate Network State Using Cisco PyATS
+  hosts: iosxr
+  vars:
+    take_snapshot: true
+    pyats_snapshot_dir: pyats_snapshot
+  roles:
+    - ansible-pyats
+  tasks:
+  
+    - name: Collect Basic Information
+      iosxr_command:
+        commands:
+          - show ip interface brief
+          # - show ospf vrf all-inclusive neighbor detail
+          # - show lldp neighbors detail
+          # - show bgp summary
+      register: cmd_out
+    
+    - name: Parse Using PyATS
+      set_fact:
+        pyats_interface: "{{ cmd_out.stdout[0] | pyats_parser('show ip interface brief','iosxr') }}"
+        # pyats_ospf_peers: "{{ cmd_out.stdout[1] | parse_pyats('show ospf nehbors','iosxr' }}"
+        # pyats_bgp_peers: "{{ cmd_out.stdout[1] | parse_pyats('show bgp summary','iosxr' }}"
+    
+    - name: Save PyATS data
+      block:
+        - name: Create PyATS Log Data
+          file:
+            path: "{{ pyats_snapshot_dir }}/{{ inventory_hostname }}"
+            state: directory
+
+        - name: Save PyATS Data
+          copy:
+            content: "{{ hostvars[inventory_hostname][item] | to_nice_json }}"
+            dest: "{{ pyats_snapshot_dir }}/{{ inventory_hostname }}/{{ item }}.json"
+          loop:
+            - pyats_interface
+            # - pyats_ospf_peers
+            # - pyats_bgp_peers
+      when:
+        - take_snapshot
+
+    # - name: Validate Interface State
+    #   assert:
+        
+    # # - name: Validate OSPF Peer
+
+    # # - name: Validate BGP State
+        
+    # - name: Diff PRE/POST State
+    #   block:
+    #     - name: Read Snapshot
+    #       set_fact:
+    #         "pre_{{ item }}": "{{ lookup('file','{{ pyats_snapshot_dir }}/{{ inventory_hostname }}/{{ item }}.json') }}"
+    #       loop:
+    #         - pyats_interface
+    #         - pyats_ospf_peers
+    #         - pyats_bgp_peers
+
+    #     - name: Creat Diff
+    #       set_fact:
+    #         "{{ item }}_diff": "{{ hostvars[inventory_hostname][item] | 
+    #                                genie_parser_diff('pre_{{ item }}') }}"
+    #       loop:
+    #         - pyats_interface
+    #         - pyats_ospf_peers
+    #         - pyats_bgp_peers
+        
+    #   set_fact:
+    #     interface_diff:
+
+
+
+
+
+       
+
+

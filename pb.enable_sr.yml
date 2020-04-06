@@ -1,0 +1,32 @@
+---
+- name: Validate Network State Using Cisco PyATS
+  hosts: junos
+  vars:
+    ansible_connection: local
+  tasks:
+    - name: Disable PFE Logging
+      junos_config:
+        lines:
+          - set system syslog user * pfe none
+
+    - name: Enable Segment Routing on Juniper Nodes
+      junos_config:
+        lines:
+          - set protocols ospf source-packet-routing
+          - delete protocols isis source-packet-routing
+    - name: Get Node INDEX
+      set_fact:
+        NODE_INDEX: "{{ (lo_ip[inventory_hostname].ip | ipaddr('address')).split('.')[-1] }}"
+      delegate_to: localhost
+      tags: index
+    - debug: var=NODE_INDEX
+      tags: index
+    - name: SET INDEX_SID
+      set_fact:
+        INDEX_SID: "{{ 400 + NODE_INDEX|int  }}" 
+    - name: Enable Prefix-SID
+      junos_config:
+        lines:
+          # - set protocols ospf source-packet-routing srgb start-label 16000
+          # - set protocols ospf source-packet-routing srgb index-label 24000
+          - set protocols ospf source-packet-routing node-segment ipv4-index {{ INDEX_SID }}

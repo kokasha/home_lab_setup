@@ -1,0 +1,136 @@
+---
+
+core_p2p_links:
+  1: {node_a: XR-P01 ,intf_a: GigabitEthernet0/0/0/0 ,node_b: MX-P02 ,intf_b: ge-0/0/0, speed: 1g}
+  2: {node_a: XR-P01 ,intf_a: GigabitEthernet0/0/0/1 ,node_b: MX-P03 ,intf_b: ge-0/0/0, speed: 1g}
+  3: {node_a: MX-P02 ,intf_a: ge-0/0/1 ,node_b: MX-P03 ,intf_b: ge-0/0/1, speed: 1g}
+  4: {node_a: XR-PE01 ,intf_a: GigabitEthernet0/0/0/0 ,node_b: XR-P01 ,intf_b: GigabitEthernet0/0/0/2, speed: 1g}
+  5: {node_a: XR-PE01 ,intf_a: GigabitEthernet0/0/0/1 ,node_b: MX-P03 ,intf_b: ge-0/0/2, speed: 1g}
+  6: {node_a: XE-PE02 ,intf_a: GigabitEthernet2 ,node_b: XR-P01 ,intf_b: GigabitEthernet0/0/0/3, speed: 1g}
+  7: {node_a: XE-PE02 ,intf_a: GigabitEthernet3 ,node_b: MX-P03 ,intf_b: ge-0/0/3, speed: 1g}
+  8: {node_a: MX-PE03 ,intf_a: ge-0/0/0 ,node_b: MX-P02 ,intf_b: ge-0/0/4, speed: 1g}
+  9: {node_a: MX-PE03 ,intf_a: ge-0/0/1 ,node_b: MX-P03 ,intf_b: ge-0/0/4, speed: 1g}
+  10: {node_a: MX-PE04 ,intf_a: ge-0/0/0 ,node_b: MX-P02 ,intf_b: ge-0/0/5, speed: 1g}
+  11: {node_a: MX-PE04 ,intf_a: ge-0/0/1 ,node_b: MX-P03 ,intf_b: ge-0/0/5, speed: 1g}
+
+
+loopback_intfs:
+   - node: XR-P01
+     intf: Loopback0
+   - node: MX-P02
+     intf: Loopback0 
+   - node: MX-P03
+     intf: Loopback0 
+   - node: XR-PE01
+     intf: Loopback0
+   - node: XE-PE02
+     intf: Loopback0 
+   - node: MX-PE03
+     intf: Loopback0 
+   - node: MX-PE04
+     intf: Loopback0 
+
+oob_mgmt_intfs:
+   - { node: XR-P01, intf: MgmtEth0/RP0/CPU0/0 }
+   - { node: MX-P02, intf: fxp0 }
+   - { node: MX-P03, intf: fxp0 } 
+   - { node: XR-PE01, intf: MgmtEth0/RP0/CPU0/0 } 
+   - { node: XE-PE02, intf: GigabitEthernet3 } 
+   - { node: MX-PE03, intf: fxp0 } 
+   - { node: MX-PE04, intf: fxp0 }
+
+IPAM:
+  p2p_netmask: 31
+  oob_netmask: 28
+
+  subnets:
+    - role: core_p2p
+      prefix: 172.20.1.0/24
+      status: container
+      description: P2P IP address for MPLS Core
+    - role: core_loopback
+      prefix: 10.100.1.0/24
+      description: Loopback IP address for MPLS Core
+    - role: oob_mgmt
+      prefix: 172.20.5.0/24
+      site: eqx
+      description: OOB MGMT Subnet
+   
+
+INTFs:
+  mtu: 
+  # WIP: We are using MTU = 4476 since XRv doesn't support MTU > 9000
+  # WIP: Will change it in Prod
+    core: 4476
+    mgmt: 1500
+  intf_down: 0
+  intf_up: 1000
+  bfd_enabled: false
+  bfd_interval: 300
+  bfd_multiplier: 3
+  lldp_enabled: true
+
+MGMT:
+  dns_servers:
+    - 27.124.97.7
+    - 27.124.98.7
+
+  ntp_servers:
+    - 10.100.0.61
+
+  tacacs_servers:
+    - 45.113.196.25
+
+  logging_servers:
+    - 10.100.0.61
+    
+  snmp_servers:
+    - 10.100.0.61
+
+  mgmt_prefixes:
+    - 192.168.0.0/24
+    - 10.8.0.0/24
+           
+  oob_mgmt_vrf: MGMT
+  snmp_community: ccbnet
+  snmp_traps: false
+  snmp_version: 2c
+  root_pwd: '1$eJ/330n2$0RGSTYVvjzW3kDzK9rIX50'
+  local_users:
+    - username: ansible
+      passwd: '14161C180506262E757A60' # ansible123
+      hash: '$1$uO86FQk7$foNS0XuNOpUoOjpY9xzjp0' # For Juniper Nodes
+    # - username: admin
+    #   passwd: '070E25414707' # admin
+
+OSPF:
+  ospf_area: 0
+  ospf_pid: 100
+  ospf_ref_link_speed: 1000  # 1T reference Link Speed
+  ospf_hash: 0802435B070D170E264A20281A0B373F6327264A564651
+
+BGP:
+  bgp_asn: 100
+  bgp_peer_rr: false
+  bgp_topo:
+    rr:
+      - XR-P01
+
+    bgp_afs:
+      - ipv4
+      - l3vpn
+      - evpn
+  bgp_RR_PEER_GROUP: NG-IBGP-RR
+  bgp_CORERR_PEER_GROUP: NG-IBGP-RRPEER
+  bgp_RRCLIENT_PEER_GROUP: NG-IBGP-RRCLIENT 
+
+MPLS:
+  sr_enabled: true
+  sr_gsid: 16000
+  sr_gsid_jnpr: 7000
+  sr_intf_sid: 24000
+  sr_mapping_prefixes:
+    - 172.17.248.1/32
+    - 172.17.248.2/32
+    - 172.17.248.3/32
+    - 172.17.248.30/32

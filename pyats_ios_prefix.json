@@ -1,0 +1,88 @@
+{
+    "prefix_set_name": {
+        "ANSIBEL_DEFAULT": {
+            "count": 4,
+            "prefix_set_name": "ANSIBEL_DEFAULT",
+            "prefixes": {
+                "0.0.0.0/0 0..0 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "0..0",
+                    "prefix": "0.0.0.0/0",
+                    "refcount": 1,
+                    "sequence": 5
+                },
+                "0.0.0.0/0 0..8 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "0..8",
+                    "prefix": "0.0.0.0/0",
+                    "refcount": 0,
+                    "sequence": 20
+                },
+                "0.0.0.0/0 24..24 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "24..24",
+                    "prefix": "0.0.0.0/0",
+                    "refcount": 0,
+                    "sequence": 10
+                },
+                "0.0.0.0/0 26..28 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "26..28",
+                    "prefix": "0.0.0.0/0",
+                    "refcount": 0,
+                    "sequence": 15
+                }
+            },
+            "protocol": "ipv4",
+            "range_entries": 3,
+            "refcount": 2,
+            "sequences": "5 - 20"
+        },
+        "ANSIBLE_TEST": {
+            "count": 4,
+            "prefix_set_name": "ANSIBLE_TEST",
+            "prefixes": {
+                "10.1.0.0/24 24..24 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "24..24",
+                    "prefix": "10.1.0.0/24",
+                    "refcount": 4,
+                    "sequence": 5
+                },
+                "10.1.1.0/24 28..32 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "28..32",
+                    "prefix": "10.1.1.0/24",
+                    "refcount": 1,
+                    "sequence": 10
+                },
+                "10.1.2.0/24 25..28 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "25..28",
+                    "prefix": "10.1.2.0/24",
+                    "refcount": 1,
+                    "sequence": 15
+                },
+                "10.2.0.0/16 16..20 permit": {
+                    "action": "permit",
+                    "hit_count": 0,
+                    "masklength_range": "16..20",
+                    "prefix": "10.2.0.0/16",
+                    "refcount": 1,
+                    "sequence": 20
+                }
+            },
+            "protocol": "ipv4",
+            "range_entries": 3,
+            "refcount": 1,
+            "sequences": "5 - 20"
+        }
+    }
+}

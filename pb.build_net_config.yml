@@ -1,0 +1,8 @@
+---
+- name: Build Core configuration
+  hosts: all
+  gather_facts: no
+  vars:
+    ansible_connection: local
+  roles:
+    - build_core_config
